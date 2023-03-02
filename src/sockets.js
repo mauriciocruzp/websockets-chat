@@ -1,40 +1,54 @@
+const fs = require('fs');
+
 module.exports = (io) => {
 
     let nickNames = [];
 
     io.on('connection', socket => {
-        console.log('Nuevo usuario conectado');
+        console.log('New user conected');
 
-        socket.on('enviar mensaje', (datos) => {
-            io.sockets.emit('nuevo mensaje', {
-                msg: datos,
+        socket.on('new image', (file, callback) => {
+            console.log(file);
+
+            io.sockets.emit('new image message', {
+                msg: file,
+                nick: socket.nickname
+            });
+            fs.writeFile("images/img", file, (err) => {
+                callback({ message: err ? "failure" : "success" });
+              });
+        });
+
+        socket.on('send message', (data) => {
+            io.sockets.emit('new message', {
+                msg: data,
                 nick: socket.nickname
             });
         });
 
 
-        socket.on('nuevo usuario', (datos, callback) => {
+        socket.on('new user', (data, callback) => {
 
-            if (nickNames.indexOf(datos) != -1) {
+            if (nickNames.indexOf(data) != -1) {
                 callback(false);
             } else {
                 callback(true);
-                socket.nickname = datos;
+                socket.nickname = data;
                 nickNames.push(socket.nickname);
-                actualizarUsuarios();
+                updateUsers();
             }
         });
 
-        socket.on('disconnect', datos => {
+        socket.on('disconnect', data => {
             if (!socket.nickname) {
                 return;
             } else {
                 nickNames.splice(nickNames.indexOf(socket.nickname), 1);
-                actualizarUsuarios();
+                updateUsers();
             }
         });
 
-        function actualizarUsuarios() {
+        function updateUsers() {
             io.sockets.emit('usernames', nickNames);
         }
 
