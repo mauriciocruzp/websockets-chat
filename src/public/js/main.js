@@ -47,21 +47,23 @@ $(function () {
 
     nickForm.submit(e => {
         e.preventDefault();
-        console.log('Sending...');
-        socket.emit('new user', nickName.val(), data => {
-            if (data) {
-                nick = nickName.val();
-                $('#nick-wrap').hide();
-                $('#content-wrap').show();
-            } else {
-                nickError.html(`
-                <div class="alert alert-danger">
-                User already exists
-                </div>
-                `);
-            }
-            nickName.val('');
-        });
+        if (nickName.val() !== '') {
+            console.log('Sending...');
+            socket.emit('new user', nickName.val(), data => {
+                if (data) {
+                    nick = nickName.val();
+                    $('#nick-wrap').hide();
+                    $('#content-wrap').show();
+                } else {
+                    nickError.html(`
+                    <div class="alert alert-danger">
+                    User already exists
+                    </div>
+                    `);
+                }
+                nickName.val('');
+            });
+        }
     });
 
     socket.on('usernames', data => {
@@ -86,6 +88,6 @@ $(function () {
 
 function upload(files) {
     socket.emit('upload', files[0], (status) => {
-      console.log(status);
+        console.log(status);
     });
-  }
+}
