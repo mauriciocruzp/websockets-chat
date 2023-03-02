@@ -1,14 +1,13 @@
-const socket = io();
-
-
-$(function () {
-    const socket = io();
+$(function methods() {
     let nick = '';
+    const socket = io();
 
     const messageForm = $('#messages-form');
     const messageBox = $('#message');
     const chat = $('#chat');
 
+    const imageForm = $('#images-form');
+    const imageBox = $('#image-box');
     const nickForm = $('#nick-form');
     const nickError = $('#nick-error');
     const nickName = $('#nick-name');
@@ -25,6 +24,14 @@ $(function () {
         messageBox.val('');
     });
 
+    imageForm.submit(e => {
+        e.preventDefault();
+        console.log(imageBox);
+        socket.emit('new image', imageBox[0].files[0], (status) => {
+            console.log(status);
+        });
+    });
+
     socket.on('new message', function (data) {
         let color = '#f5f4f4';
         let side = 'start';
@@ -38,6 +45,31 @@ $(function () {
         <div class="w-50">
         <div class="msg-area mb-2" style="background-color:${color}">
             <p class="msg"><b>${data.nick} :</b> ${data.msg}</p>
+        </div>
+        </div>
+        </div>
+        `);
+    });
+
+    socket.on('new image message', function (data) {
+        let color = '#f5f4f4';
+        let side = 'start';
+        if (nick == data.nick) {
+            color = '#9ff4c5';
+            side = 'end';
+        }
+        console.log(data.nick);
+
+        const arrayBufferView = new Uint8Array(data.msg);
+        const blob = new Blob([arrayBufferView], { type: "image/jpeg" });
+        const urlCreator = window.URL || window.webkitURL;
+        const imageUrl = urlCreator.createObjectURL(blob);
+
+        chat.append(`
+        <div class="w-100 d-flex justify-content-${side}">
+        <div class="w-50">
+        <div class="msg-area mb-2 d-flex flex-column" style="background-color:${color}">
+            <p class="msg"><b>${data.nick} :</b></p><img src="${imageUrl}">
         </div>
         </div>
         </div>
@@ -83,11 +115,4 @@ $(function () {
         }
         userNames.html(html);
     });
-
 });
-
-function upload(files) {
-    socket.emit('upload', files[0], (status) => {
-        console.log(status);
-    });
-}

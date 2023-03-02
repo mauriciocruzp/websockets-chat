@@ -1,9 +1,23 @@
+const fs = require('fs');
+
 module.exports = (io) => {
 
     let nickNames = [];
 
     io.on('connection', socket => {
         console.log('New user conected');
+
+        socket.on('new image', (file, callback) => {
+            console.log(file);
+
+            io.sockets.emit('new image message', {
+                msg: file,
+                nick: socket.nickname
+            });
+            fs.writeFile("images/img", file, (err) => {
+                callback({ message: err ? "failure" : "success" });
+              });
+        });
 
         socket.on('send message', (data) => {
             io.sockets.emit('new message', {
