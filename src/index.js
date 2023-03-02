@@ -12,5 +12,5 @@ require('./sockets')(socketio);
 app.use(express.static(path.join(__dirname, 'public')));
 
 server.listen(app.get('port'), () =>{
-    console.log("Servidor en el puerto ", app.get('port'));
+    console.log("Server is running on port ", app.get('port'));
 });

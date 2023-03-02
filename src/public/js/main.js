@@ -15,17 +15,17 @@ $(function () {
     messageForm.submit(e => {
         e.preventDefault();
         if (messageBox.val() !== '') {
-            socket.emit('enviar mensaje', messageBox.val());
+            socket.emit('send message', messageBox.val());
 
             messageBox.val('');
         }
         messageBox.val('');
     });
 
-    socket.on('nuevo mensaje', function (datos) {
+    socket.on('new message', function (data) {
         let color = '#f5f4f4';
         let side = 'start';
-        if (nick == datos.nick) {
+        if (nick == data.nick) {
             color = '#9ff4c5';
             side = 'end';
         }
@@ -34,7 +34,7 @@ $(function () {
         <div class="w-100 d-flex justify-content-${side}">
         <div class="w-50">
         <div class="msg-area mb-2" style="background-color:${color}">
-            <p class="msg"><b>${datos.nick} :</b> ${datos.msg}</p>
+            <p class="msg"><b>${data.nick} :</b> ${data.msg}</p>
         </div>
         </div>
         </div>
@@ -44,16 +44,16 @@ $(function () {
 
     nickForm.submit(e => {
         e.preventDefault();
-        console.log('Enviando...');
-        socket.emit('nuevo usuario', nickName.val(), datos => {
-            if (datos) {
+        console.log('Sending...');
+        socket.emit('new user', nickName.val(), data => {
+            if (data) {
                 nick = nickName.val();
                 $('#nick-wrap').hide();
                 $('#content-wrap').show();
             } else {
                 nickError.html(`
                 <div class="alert alert-danger">
-                El usuario ya existe
+                User already exists
                 </div>
                 `);
             }
@@ -61,20 +61,20 @@ $(function () {
         });
     });
 
-    socket.on('usernames', datos => {
+    socket.on('usernames', data => {
         let html = '';
         let color = '#000';
-        let salir = '';
+        let goOut = '';
         console.log(nick);
-        for (let i = 0; i < datos.length; i++) {
-            if (nick == datos[i]) {
+        for (let i = 0; i < data.length; i++) {
+            if (nick == data[i]) {
                 color = '#027f43';
-                salir = `<a class="enlace-salir" href="/"><i class="fas fa-sign-out-alt salir"></i></a>`;
+                goOut = `<a class="link-go-out" href="/"><i class="fas fa-sign-out-alt go-out"></i></a>`;
             } else {
                 color = '#000';
-                salir = '';
+                goOut = '';
             }
-            html += `<p style="color:${color}"><i class="fas fa-user"></i> ${datos[i]} ${salir}</p>`;
+            html += `<p style="color:${color}"><i class="fas fa-user"></i> ${data[i]} ${goOut}</p>`;
         }
         userNames.html(html);
     });
