@@ -5,7 +5,7 @@ module.exports = (io) => {
     let nickNames = [];
 
     io.on('connection', socket => {
-        console.log('New user conected');
+        console.log('New socket conected');
 
         socket.on('new image', (file, callback) => {
             console.log(file);
@@ -34,6 +34,7 @@ module.exports = (io) => {
             } else {
                 callback(true);
                 socket.nickname = data;
+                console.log(`New user ${socket.nickname}`)
                 nickNames.push(socket.nickname);
                 updateUsers();
             }
