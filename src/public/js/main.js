@@ -16,12 +16,16 @@ $(function methods() {
 
     messageForm.submit(e => {
         e.preventDefault();
-        if (messageBox.val() !== '') {
-            socket.emit('send message', messageBox.val());
-
+        if (messageBox.val().includes('/')) {
+            console.log(true);
+            socket.emit('private message', messageBox.val());
             messageBox.val('');
         }
-        messageBox.val('');
+
+        if (messageBox.val() !== '') {
+            socket.emit('send message', messageBox.val());
+            messageBox.val('');
+        }
     });
 
     imageForm.submit(e => {
